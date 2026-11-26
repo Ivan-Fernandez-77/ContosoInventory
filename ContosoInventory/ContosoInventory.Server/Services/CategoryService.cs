@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ContosoInventory.Server.Data;
 using ContosoInventory.Server.Models;
+using ContosoInventory.Server.Repositories;
 using ContosoInventory.Shared.DTOs;
 
 namespace ContosoInventory.Server.Services;
@@ -11,11 +12,16 @@ namespace ContosoInventory.Server.Services;
 public class CategoryService : ICategoryService
 {
     private readonly InventoryContext _context;
+    private readonly IProductRepository _productRepository;
     private readonly ILogger<CategoryService> _logger;
 
-    public CategoryService(InventoryContext context, ILogger<CategoryService> logger)
+    public CategoryService(
+        InventoryContext context,
+        IProductRepository productRepository,
+        ILogger<CategoryService> logger)
     {
         _context = context;
+        _productRepository = productRepository;
         _logger = logger;
     }
 
@@ -150,6 +156,12 @@ public class CategoryService : ICategoryService
             if (category == null)
             {
                 return false;
+            }
+
+            if (await _productRepository.HasProductsInCategoryAsync(id))
+            {
+                throw new InvalidOperationException(
+                    $"Category '{category.Name}' cannot be deleted while products are assigned to it.");
             }
 
             _context.Categories.Remove(category);

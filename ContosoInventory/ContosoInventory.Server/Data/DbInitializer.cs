@@ -116,6 +116,63 @@ public static class DbInitializer
             await context.SaveChangesAsync();
             logger.LogInformation("Categories seeded: {Count} categories.", categories.Count);
         }
+
+        if (!await context.Products.AnyAsync())
+        {
+            var categoryIds = await context.Categories
+                .OrderBy(category => category.DisplayOrder)
+                .Select(category => category.Id)
+                .ToListAsync();
+
+            if (categoryIds.Count == 0)
+            {
+                logger.LogWarning("Products were not seeded because no categories exist.");
+            }
+            else
+            {
+                var now = DateTime.UtcNow;
+                var products = new List<Product>
+                {
+                    new()
+                    {
+                        Name = "Contoso Laptop 14",
+                        Sku = "CONTOSO-LAP-14",
+                        Description = "14-inch business laptop",
+                        Price = 1299.99m,
+                        StockQuantity = 12,
+                        CategoryId = categoryIds[0],
+                        CreatedDate = now,
+                        LastUpdatedDate = now
+                    },
+                    new()
+                    {
+                        Name = "Contoso 27-inch Monitor",
+                        Sku = "CONTOSO-MON-27",
+                        Description = "27-inch 4K business monitor",
+                        Price = 349.99m,
+                        StockQuantity = 18,
+                        CategoryId = categoryIds[categoryIds.Count > 1 ? 1 : 0],
+                        CreatedDate = now,
+                        LastUpdatedDate = now
+                    },
+                    new()
+                    {
+                        Name = "Contoso 8-Port Switch",
+                        Sku = "CONTOSO-SW-8",
+                        Description = "8-port managed network switch",
+                        Price = 149.99m,
+                        StockQuantity = 7,
+                        CategoryId = categoryIds[categoryIds.Count > 2 ? 2 : 0],
+                        CreatedDate = now,
+                        LastUpdatedDate = now
+                    }
+                };
+
+                context.Products.AddRange(products);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Products seeded: {Count} products.", products.Count);
+            }
+        }
     }
 
     private static async Task SeedUserAsync(

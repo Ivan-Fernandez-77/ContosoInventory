@@ -2,7 +2,7 @@
 
 A C# web application for managing Contoso's IT equipment inventory. Built with ASP.NET Core Web API, Blazor WebAssembly, and Entity Framework Core with SQLite.
 
-This starter application is designed for the Microsoft Learn training module **"Configure and customize GitHub Copilot in Visual Studio Code."** It provides a fully functional Categories feature that learners extend with a Product management feature using GitHub Copilot customization capabilities.
+This starter application is designed for the Microsoft Learn training module **"Configure and customize GitHub Copilot in Visual Studio Code."** It provides category management and a product inventory API.
 
 ## Prerequisites
 
@@ -33,7 +33,21 @@ This starter application is designed for the Microsoft Learn training module **"
 
 4. Open a browser and navigate to `http://localhost:5240`.
 
-On the first run, the application automatically creates the SQLite database, applies migrations, and seeds demo data.
+On the first run, the application automatically creates the SQLite database, applies migrations, and seeds demo users, categories, and products.
+
+## Tests
+
+Run the test suite from the `ContosoInventory` solution directory:
+
+```bash
+dotnet test ContosoInventory.Tests/ContosoInventory.Tests.csproj
+```
+
+To run only product service tests:
+
+```bash
+dotnet test ContosoInventory.Tests/ContosoInventory.Tests.csproj --filter FullyQualifiedName~ProductServiceTests
+```
 
 ## Demo Credentials
 
@@ -44,6 +58,12 @@ On the first run, the application automatically creates the SQLite database, app
 
 - **Admin** users can create, edit, delete, and toggle categories.
 - **Viewer** users have read-only access.
+
+## Product API
+
+Authenticated users can list and read products using `GET /api/products` and `GET /api/products/{id}`. The list endpoint accepts an optional `categoryId` query parameter. Admin users can create, update, and delete products, and restock inventory using `POST /api/products/{id}/restock` with a positive `quantity` in the JSON body.
+
+Product SKUs are unique, product descriptions are required, prices must be greater than zero, and categories with assigned products cannot be deleted.
 
 ## Project Structure
 

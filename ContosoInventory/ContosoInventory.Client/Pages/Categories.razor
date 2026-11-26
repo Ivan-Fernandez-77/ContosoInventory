@@ -45,6 +45,7 @@ else
                     <th>Description</th>
                     <th>Display Order</th>
                     <th>Status</th>
+                    <th>Products</th>
                     <AuthorizeView Roles="Admin">
                         <Authorized>
                             <th>Actions</th>
@@ -68,6 +69,11 @@ else
                             {
                                 <span class="badge bg-secondary">Inactive</span>
                             }
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/categories/{category.Id}/products")">
+                                View Products
+                            </a>
                         </td>
                         <AuthorizeView Roles="Admin">
                             <Authorized>
